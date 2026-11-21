@@ -21,7 +21,7 @@ Basic requirements from the course (all must work):
 
 Extras (for extra points): list/filter bookings, cancel a booking, delete an unused room,
 filter free rooms by minimum capacity, REST API + web frontend, a real online PostgreSQL
-database (Neon), unit tests, layered architecture, an AI usage report.
+database (Neon), unit tests, layered architecture.
 
 ---
 
@@ -182,10 +182,8 @@ Room-Booking-System/
 │   ├── SPEC.md                (everyone reads; change only by PR)
 │   ├── REQUIREMENTS.md        (Mehdi exports it to REQUIREMENTS.pdf)
 │   ├── REQUIREMENTS.pdf       (Mehdi)
-│   └── AI_USAGE_REPORT.md     (everyone writes only their own section)
 ├── docs/screenshots/          (Mehdi)
-├── tasks/                     one task file per member
-└── TASKS.md                   team plan
+└── tasks/                     one task file per member
 ```
 
 **Golden rule: only edit the files you own.** If you need a change in somebody else's file,
@@ -674,11 +672,12 @@ JSON examples:
 ## 14. Git workflow (everyone)
 
 1. `git checkout main` and `git pull`
-2. `git checkout -b <your-branch>` (branch names are in `TASKS.md`)
+2. `git checkout -b <YourName>` (branch names: `Onur`, `huseyn`, `aydan`, `mehdi`)
 3. Small commits with clear messages: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
-4. `git push -u origin <your-branch>`
+4. `git push -u origin <YourName>`
 5. Open a Pull Request into `main` on GitHub. Ask **one other member** to review it.
 6. The reviewer reads the code, runs `mvnw test`, leaves at least one comment, approves.
-7. Merge; then everyone updates: `git checkout main`, `git pull`, `git checkout <your-branch>`, `git merge main`.
+7. Merge; then everyone updates their branch: `git fetch origin`, `git merge origin/main`.
+8. There is no fixed merge order: a PR is merged when, after merging `origin/main` into it, the project compiles and `mvnw test` passes.
 
 Each member must have **at least 3 commits and at least 1 merged Pull Request** under their own GitHub account.

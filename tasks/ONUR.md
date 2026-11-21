@@ -34,7 +34,7 @@ Rules you must follow:
    - show the complete content of every file you created or changed;
    - give the exact Git commands to commit that step (message like `feat: ...`);
    - tell the student how to check that the step works (command and expected result).
-6. Start by giving the Git commands to switch to the branch `onur/data-layer` (create it from an
+6. Start by giving the Git commands to switch to the branch `Onur` (create it from an
    up-to-date `main` if it does not exist).
 7. Never write a real database password into any file. Neon credentials only come from the
    environment variables `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
@@ -43,15 +43,42 @@ Rules you must follow:
 9. At the end, write **"Explanation for Onur"**: explain every file you wrote in simple
    English (what it does, why it is designed this way, how data flows through it), then answer
    every question in "Questions you must be able to answer" briefly and clearly.
-10. Also give Onur 3–5 lines to paste into their section of `docs/AI_USAGE_REPORT.md`
-    (what the AI did, what the student checked or changed).
+
+---
+
+## 0.1 Getting the other members' code (no fixed order)
+
+The four members do **not** work in a fixed order — anybody may finish first. So never assume a
+branch exists or is merged; **check first**, at the start and every time you need someone's work:
+
+```bash
+git fetch origin
+git branch -r                          # which branches exist on GitHub
+git branch -r --merged origin/main     # which of them are already merged into main
+```
+
+Team branches (exact names, case matters): `Onur`, `huseyn`, `aydan`, `mehdi`.
+For **each** member listed under "Depends on" in section 1, do the first case that is true:
+
+| Situation | What to do |
+|-----------|------------|
+| Their branch is already merged into `main` | `git merge origin/main` (into your branch). |
+| Their branch exists on GitHub but is not merged yet | `git merge origin/<branch>` (e.g. `git merge origin/Onur`, `git merge origin/huseyn`) so your code compiles and runs. Their commits keep their author name. Tell them you did it; later, when their PR is merged, just run `git merge origin/main` again. |
+| Their branch does not exist yet | Write your code from the contract (Appendix A) — names and signatures are fixed, so it will compile once their code arrives. Unit tests use mocks/fake data, so they do not need the real code. Check again later. |
+
+Rules:
+- A Pull Request may be merged into `main` **only when, after `git merge origin/main`, the project compiles and `mvnw test` passes** on that branch. This is the only ordering rule.
+- Merge conflicts should not happen because every file has one owner. If one happens in a shared doc
+  (e.g. `docs/SPEC.md`), keep **both** sides. Never "fix" a conflict by deleting another member's code — ask them.
 
 ---
 
 ## 1. Your role
 
 **Onur — Project setup, Neon PostgreSQL and the Data layer.**
-Branch: `onur/data-layer` · Merge order: **1st** — the others need your code to compile, so finish early (target: end of week 1).
+Branch: `Onur` · **Depends on:** nobody.
+**Who depends on you:** Huseyn and Aydan need your entities, repositories and exceptions to compile.
+So **push early and often** (push your branch as soon as step 5 compiles, even before the PR), so they can `git merge origin/Onur`. Target: end of week 1.
 
 You build the foundation: the Maven/Spring Boot project, the connection to the online Neon
 PostgreSQL database, the SQL schema, the `Room`/`Booking` entities, all exception classes, the
@@ -91,7 +118,7 @@ Go to https://start.spring.io and choose: Project **Maven**, Language **Java**, 
 Name `room-booking-system`, Package name `com.roombooking`, Packaging **Jar**, Java **27**.
 Dependencies: **Spring Web, Spring Data JPA, Validation, PostgreSQL Driver, H2 Database**.
 Download, unzip, copy the contents into the repository root (keep the existing `docs/`, `tasks/`,
-`.claude/`, `TASKS.md`). Then in `pom.xml`:
+`.claude/`). Then in `pom.xml`:
 - change the H2 dependency scope to `test`;
 - add `org.springdoc:springdoc-openapi-starter-webmvc-ui` (latest **3.x**, the version for Spring Boot 4);
 - rename the main class to `RoomBookingApplication` if Initializr named it differently;
@@ -178,21 +205,20 @@ architecture diagram (copy from contract section 3); short folder structure;
 (IntelliJ, PowerShell `$env:DB_URL="..."`, macOS/Linux `export DB_URL=...`);
 **run** (`mvnw.cmd spring-boot:run` / `./mvnw spring-boot:run`); **test** (`mvnw test`, no Neon needed);
 links: UI `http://localhost:8080/`, Swagger `http://localhost:8080/swagger-ui.html`;
-links to `docs/REQUIREMENTS.md`, `docs/SPEC.md`, `TASKS.md`, `docs/AI_USAGE_REPORT.md`;
+links to `docs/REQUIREMENTS.md`, `docs/SPEC.md` and the `tasks/` folder;
 team table (Onur, Huseyn, Aydan, Mehdi + area); an empty "Screenshots" section (Mehdi fills it).
 Commit: `docs: write README`
 
 ### Step 9 — Pull Request
 Push and open PR **"Data layer: Spring Boot setup, Neon PostgreSQL, entities, repositories"** into `main`.
-Reviewer: **Huseyn**. After merge, tell the team so they run `git merge main`.
+Reviewer: **Huseyn**. After merge, tell the team so they run `git merge origin/main`.
 
 ## 4. Definition of Done
 - [ ] App starts and creates both tables in Neon; seeder adds 5 rooms once.
 - [ ] `mvnw test` passes without internet (H2).
 - [ ] All class/method names match the contract exactly.
 - [ ] No real password anywhere in Git (check `git diff` before every commit).
-- [ ] PR reviewed by Huseyn and merged first.
-- [ ] Your section of `docs/AI_USAGE_REPORT.md` is filled.
+- [ ] PR reviewed by Huseyn and merged (as early as possible — others depend on it).
 
 ## 5. Questions you must be able to answer
 1. What is Spring Boot and what does `@SpringBootApplication` do?
@@ -234,7 +260,7 @@ Basic requirements from the course (all must work):
 
 Extras (for extra points): list/filter bookings, cancel a booking, delete an unused room,
 filter free rooms by minimum capacity, REST API + web frontend, a real online PostgreSQL
-database (Neon), unit tests, layered architecture, an AI usage report.
+database (Neon), unit tests, layered architecture.
 
 ---
 
@@ -395,10 +421,8 @@ Room-Booking-System/
 │   ├── SPEC.md                (everyone reads; change only by PR)
 │   ├── REQUIREMENTS.md        (Mehdi exports it to REQUIREMENTS.pdf)
 │   ├── REQUIREMENTS.pdf       (Mehdi)
-│   └── AI_USAGE_REPORT.md     (everyone writes only their own section)
 ├── docs/screenshots/          (Mehdi)
-├── tasks/                     one task file per member
-└── TASKS.md                   team plan
+└── tasks/                     one task file per member
 ```
 
 **Golden rule: only edit the files you own.** If you need a change in somebody else's file,
@@ -887,11 +911,12 @@ JSON examples:
 ## 14. Git workflow (everyone)
 
 1. `git checkout main` and `git pull`
-2. `git checkout -b <your-branch>` (branch names are in `TASKS.md`)
+2. `git checkout -b <YourName>` (branch names: `Onur`, `huseyn`, `aydan`, `mehdi`)
 3. Small commits with clear messages: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
-4. `git push -u origin <your-branch>`
+4. `git push -u origin <YourName>`
 5. Open a Pull Request into `main` on GitHub. Ask **one other member** to review it.
 6. The reviewer reads the code, runs `mvnw test`, leaves at least one comment, approves.
-7. Merge; then everyone updates: `git checkout main`, `git pull`, `git checkout <your-branch>`, `git merge main`.
+7. Merge; then everyone updates their branch: `git fetch origin`, `git merge origin/main`.
+8. There is no fixed merge order: a PR is merged when, after merging `origin/main` into it, the project compiles and `mvnw test` passes.
 
 Each member must have **at least 3 commits and at least 1 merged Pull Request** under their own GitHub account.

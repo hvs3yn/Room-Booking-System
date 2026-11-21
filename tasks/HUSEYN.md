@@ -34,7 +34,7 @@ Rules you must follow:
    - show the complete content of every file you created or changed;
    - give the exact Git commands to commit that step (message like `feat: ...`);
    - tell the student how to check that the step works (command and expected result).
-6. Start by giving the Git commands to switch to the branch `huseyn/business-logic` (create it from an
+6. Start by giving the Git commands to switch to the branch `huseyn` (create it from an
    up-to-date `main` if it does not exist).
 7. Never write a real database password into any file. Neon credentials only come from the
    environment variables `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
@@ -43,15 +43,41 @@ Rules you must follow:
 9. At the end, write **"Explanation for Huseyn"**: explain every file you wrote in simple
    English (what it does, why it is designed this way, how data flows through it), then answer
    every question in "Questions you must be able to answer" briefly and clearly.
-10. Also give Huseyn 3–5 lines to paste into their section of `docs/AI_USAGE_REPORT.md`
-    (what the AI did, what the student checked or changed).
+
+---
+
+## 0.1 Getting the other members' code (no fixed order)
+
+The four members do **not** work in a fixed order — anybody may finish first. So never assume a
+branch exists or is merged; **check first**, at the start and every time you need someone's work:
+
+```bash
+git fetch origin
+git branch -r                          # which branches exist on GitHub
+git branch -r --merged origin/main     # which of them are already merged into main
+```
+
+Team branches (exact names, case matters): `Onur`, `huseyn`, `aydan`, `mehdi`.
+For **each** member listed under "Depends on" in section 1, do the first case that is true:
+
+| Situation | What to do |
+|-----------|------------|
+| Their branch is already merged into `main` | `git merge origin/main` (into your branch). |
+| Their branch exists on GitHub but is not merged yet | `git merge origin/<branch>` (e.g. `git merge origin/Onur`, `git merge origin/huseyn`) so your code compiles and runs. Their commits keep their author name. Tell them you did it; later, when their PR is merged, just run `git merge origin/main` again. |
+| Their branch does not exist yet | Write your code from the contract (Appendix A) — names and signatures are fixed, so it will compile once their code arrives. Unit tests use mocks/fake data, so they do not need the real code. Check again later. |
+
+Rules:
+- A Pull Request may be merged into `main` **only when, after `git merge origin/main`, the project compiles and `mvnw test` passes** on that branch. This is the only ordering rule.
+- Merge conflicts should not happen because every file has one owner. If one happens in a shared doc
+  (e.g. `docs/SPEC.md`), keep **both** sides. Never "fix" a conflict by deleting another member's code — ask them.
 
 ---
 
 ## 1. Your role
 
 **Huseyn — Business logic (service layer) and the main unit tests.**
-Branch: `huseyn/business-logic` · Merge order: **2nd** (after Onur).
+Branch: `huseyn` · **Depends on:** Onur (entities, repositories, exceptions — needed to compile).
+**Who depends on you:** Aydan (controllers call your services).
 
 You write the "brain" of the application: every validation rule, the **no double booking** rule,
 and the **free rooms** search. You also write the most important unit tests of the project.
@@ -72,17 +98,11 @@ Your code must not know anything about HTTP or JSON — only Java objects, repos
 You **use** (but do not write) `Room`, `Booking`, `RoomRepository`, `BookingRepository` and all
 exceptions — they are written by Onur exactly as in the contract (sections 5, 6, 8).
 
-## 3. Before you start (compiling before Onur's PR is merged)
-Your code needs Onur's classes to compile. If Onur's branch is not merged yet:
-
-```bash
-git fetch origin
-git merge origin/onur/data-layer
-```
-
-If Onur has not pushed yet, you may write your code first and compile later — the contract tells you
-the exact API of every class you use. Your unit tests use **Mockito mocks** of the repositories,
-so they need no database at all.
+## 3. Before you start
+Follow section 0.1 for **Onur**: if Onur's work is in `main`, merge `origin/main`; if only the `Onur` branch exists,
+merge `origin/Onur`; if nothing exists yet, write your code from the contract and compile later.
+Your unit tests use **Mockito mocks** of the repositories, so they need no database and no real repository code.
+Push your branch early (once `RoomService` compiles) so Aydan can use it.
 
 ## 4. Steps
 
@@ -167,7 +187,7 @@ Commits: `test: add time rules tests`, `test: add room service tests`, `test: ad
 
 ### Step 5 — Pull Request
 Push and open PR **"Business logic: validation, double-booking rule, free-room search"** into `main`
-(after Onur's PR is merged; run `git merge main` first). Reviewer: **Onur**.
+(first do section 0.1 again: `git merge origin/main`; the project must compile and `mvnw test` must pass). Reviewer: **Onur**.
 In the PR description, list which business rule (BR-1…BR-14) is covered by which test.
 
 ## 5. Definition of Done
@@ -176,7 +196,6 @@ In the PR description, list which business rule (BR-1…BR-14) is covered by whi
 - [ ] Every error message matches contract section 9 character by character.
 - [ ] `mvnw test` passes; service tests run without a database.
 - [ ] PR reviewed by Onur and merged.
-- [ ] Your section of `docs/AI_USAGE_REPORT.md` is filled.
 
 ## 6. Questions you must be able to answer
 1. Why are business rules in the service layer and not in the controller or the repository?
@@ -218,7 +237,7 @@ Basic requirements from the course (all must work):
 
 Extras (for extra points): list/filter bookings, cancel a booking, delete an unused room,
 filter free rooms by minimum capacity, REST API + web frontend, a real online PostgreSQL
-database (Neon), unit tests, layered architecture, an AI usage report.
+database (Neon), unit tests, layered architecture.
 
 ---
 
@@ -379,10 +398,8 @@ Room-Booking-System/
 │   ├── SPEC.md                (everyone reads; change only by PR)
 │   ├── REQUIREMENTS.md        (Mehdi exports it to REQUIREMENTS.pdf)
 │   ├── REQUIREMENTS.pdf       (Mehdi)
-│   └── AI_USAGE_REPORT.md     (everyone writes only their own section)
 ├── docs/screenshots/          (Mehdi)
-├── tasks/                     one task file per member
-└── TASKS.md                   team plan
+└── tasks/                     one task file per member
 ```
 
 **Golden rule: only edit the files you own.** If you need a change in somebody else's file,
@@ -871,11 +888,12 @@ JSON examples:
 ## 14. Git workflow (everyone)
 
 1. `git checkout main` and `git pull`
-2. `git checkout -b <your-branch>` (branch names are in `TASKS.md`)
+2. `git checkout -b <YourName>` (branch names: `Onur`, `huseyn`, `aydan`, `mehdi`)
 3. Small commits with clear messages: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
-4. `git push -u origin <your-branch>`
+4. `git push -u origin <YourName>`
 5. Open a Pull Request into `main` on GitHub. Ask **one other member** to review it.
 6. The reviewer reads the code, runs `mvnw test`, leaves at least one comment, approves.
-7. Merge; then everyone updates: `git checkout main`, `git pull`, `git checkout <your-branch>`, `git merge main`.
+7. Merge; then everyone updates their branch: `git fetch origin`, `git merge origin/main`.
+8. There is no fixed merge order: a PR is merged when, after merging `origin/main` into it, the project compiles and `mvnw test` passes.
 
 Each member must have **at least 3 commits and at least 1 merged Pull Request** under their own GitHub account.

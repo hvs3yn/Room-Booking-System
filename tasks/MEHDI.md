@@ -34,7 +34,7 @@ Rules you must follow:
    - show the complete content of every file you created or changed;
    - give the exact Git commands to commit that step (message like `feat: ...`);
    - tell the student how to check that the step works (command and expected result).
-6. Start by giving the Git commands to switch to the branch `mehdi/frontend` (create it from an
+6. Start by giving the Git commands to switch to the branch `mehdi` (create it from an
    up-to-date `main` if it does not exist).
 7. Never write a real database password into any file. Neon credentials only come from the
    environment variables `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
@@ -43,15 +43,41 @@ Rules you must follow:
 9. At the end, write **"Explanation for Mehdi"**: explain every file you wrote in simple
    English (what it does, why it is designed this way, how data flows through it), then answer
    every question in "Questions you must be able to answer" briefly and clearly.
-10. Also give Mehdi 3–5 lines to paste into their section of `docs/AI_USAGE_REPORT.md`
-    (what the AI did, what the student checked or changed).
+
+---
+
+## 0.1 Getting the other members' code (no fixed order)
+
+The four members do **not** work in a fixed order — anybody may finish first. So never assume a
+branch exists or is merged; **check first**, at the start and every time you need someone's work:
+
+```bash
+git fetch origin
+git branch -r                          # which branches exist on GitHub
+git branch -r --merged origin/main     # which of them are already merged into main
+```
+
+Team branches (exact names, case matters): `Onur`, `huseyn`, `aydan`, `mehdi`.
+For **each** member listed under "Depends on" in section 1, do the first case that is true:
+
+| Situation | What to do |
+|-----------|------------|
+| Their branch is already merged into `main` | `git merge origin/main` (into your branch). |
+| Their branch exists on GitHub but is not merged yet | `git merge origin/<branch>` (e.g. `git merge origin/Onur`, `git merge origin/huseyn`) so your code compiles and runs. Their commits keep their author name. Tell them you did it; later, when their PR is merged, just run `git merge origin/main` again. |
+| Their branch does not exist yet | Write your code from the contract (Appendix A) — names and signatures are fixed, so it will compile once their code arrives. Unit tests use mocks/fake data, so they do not need the real code. Check again later. |
+
+Rules:
+- A Pull Request may be merged into `main` **only when, after `git merge origin/main`, the project compiles and `mvnw test` passes** on that branch. This is the only ordering rule.
+- Merge conflicts should not happen because every file has one owner. If one happens in a shared doc
+  (e.g. `docs/SPEC.md`), keep **both** sides. Never "fix" a conflict by deleting another member's code — ask them.
 
 ---
 
 ## 1. Your role
 
 **Mehdi — Web frontend, requirements PDF, screenshots and demo preparation.**
-Branch: `mehdi/frontend` · Merge order: **4th** (last).
+Branch: `mehdi` · **Depends on:** nothing to compile (your files are HTML/CSS/JS). To **run** the UI against the real API you need Onur's, Huseyn's and Aydan's code.
+Your PR can be merged at any time — even before the others — because static files do not break the Java build.
 
 You build what the user and the teacher actually see: a clean single-page web interface that uses
 the REST API for all four features. You also export the requirements document to PDF, add
@@ -73,14 +99,16 @@ You may add a "Screenshots" section to `README.md` **only after Onur's README is
 Do not edit any Java file.
 
 ## 3. Before you start
-The UI needs the API (Aydan) to really work. You can start immediately:
+You can start immediately, whatever the others have done:
 - build the HTML/CSS layout first (no API needed);
-- write `api.js` from the contract (section 11) — the URLs and JSON shapes are fixed;
-- to try the UI before the backend exists, open `index.html` directly and temporarily use fake data
-  in `app.js` — **remove all fake data before committing**.
-When Aydan's branch is pushed: `git fetch origin` then `git merge origin/aydan/api` (it already
-contains Onur's and Huseyn's work if they were merged into `main`; otherwise merge those branches too),
-set the Neon env variables, run the app and open `http://localhost:8080/`.
+- write `api.js` from the contract (section 11) — URLs and JSON shapes are fixed.
+
+To test with the real backend, follow section 0.1 for **Onur**, **Huseyn** and **Aydan** (each separately).
+- If all three are available (in `main` or as branches): merge them, set the Neon env variables,
+  run the app and open `http://localhost:8080/`.
+- If some are missing: open `index.html` directly in the browser and temporarily use fake data in
+  `app.js` — **remove all fake data before committing**. Do the real end-to-end test (step 4) later,
+  once the backend exists.
 
 ## 4. Steps
 
@@ -159,7 +187,7 @@ run `mvnw test` (all green) → show GitHub PRs/branches.
 Commit: `docs: add demo script`
 
 ### Step 7 — Pull Request
-`git merge main`, run the app, push, open PR **"Frontend: web UI for rooms, bookings and free rooms"**.
+Do section 0.1 again (`git merge origin/main`), run the app if the backend exists, push, open PR **"Frontend: web UI for rooms, bookings and free rooms"**.
 Reviewer: **Aydan**. Attach 2 screenshots in the PR description.
 
 ## 5. Definition of Done
@@ -168,7 +196,6 @@ Reviewer: **Aydan**. Attach 2 screenshots in the PR description.
 - [ ] No `innerHTML` with user/API data; no inline `onclick`; no fake data left.
 - [ ] `docs/REQUIREMENTS.pdf`, screenshots and `docs/DEMO.md` committed.
 - [ ] PR reviewed by Aydan and merged.
-- [ ] Your section of `docs/AI_USAGE_REPORT.md` is filled.
 
 ## 6. Questions you must be able to answer
 1. How does the browser get `index.html` from Spring Boot (the `static/` folder)?
@@ -210,7 +237,7 @@ Basic requirements from the course (all must work):
 
 Extras (for extra points): list/filter bookings, cancel a booking, delete an unused room,
 filter free rooms by minimum capacity, REST API + web frontend, a real online PostgreSQL
-database (Neon), unit tests, layered architecture, an AI usage report.
+database (Neon), unit tests, layered architecture.
 
 ---
 
@@ -371,10 +398,8 @@ Room-Booking-System/
 │   ├── SPEC.md                (everyone reads; change only by PR)
 │   ├── REQUIREMENTS.md        (Mehdi exports it to REQUIREMENTS.pdf)
 │   ├── REQUIREMENTS.pdf       (Mehdi)
-│   └── AI_USAGE_REPORT.md     (everyone writes only their own section)
 ├── docs/screenshots/          (Mehdi)
-├── tasks/                     one task file per member
-└── TASKS.md                   team plan
+└── tasks/                     one task file per member
 ```
 
 **Golden rule: only edit the files you own.** If you need a change in somebody else's file,
@@ -863,11 +888,12 @@ JSON examples:
 ## 14. Git workflow (everyone)
 
 1. `git checkout main` and `git pull`
-2. `git checkout -b <your-branch>` (branch names are in `TASKS.md`)
+2. `git checkout -b <YourName>` (branch names: `Onur`, `huseyn`, `aydan`, `mehdi`)
 3. Small commits with clear messages: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
-4. `git push -u origin <your-branch>`
+4. `git push -u origin <YourName>`
 5. Open a Pull Request into `main` on GitHub. Ask **one other member** to review it.
 6. The reviewer reads the code, runs `mvnw test`, leaves at least one comment, approves.
-7. Merge; then everyone updates: `git checkout main`, `git pull`, `git checkout <your-branch>`, `git merge main`.
+7. Merge; then everyone updates their branch: `git fetch origin`, `git merge origin/main`.
+8. There is no fixed merge order: a PR is merged when, after merging `origin/main` into it, the project compiles and `mvnw test` passes.
 
 Each member must have **at least 3 commits and at least 1 merged Pull Request** under their own GitHub account.
