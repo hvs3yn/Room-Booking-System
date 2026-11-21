@@ -15,8 +15,22 @@ spring:
       minimum-idle: 0
       idle-timeout: 60000
       max-lifetime: 300000
+  sql:
+    init:
+      mode: always          # runs schema.sql on every start (CREATE TABLE IF NOT EXISTS)
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none        # tables come from schema.sql, not from Hibernate
     open-in-view: false
     show-sql: false
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  seed:
+    enabled: true           # DataSeeder adds demo rooms on start
