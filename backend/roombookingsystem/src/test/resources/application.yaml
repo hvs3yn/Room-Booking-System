@@ -1,0 +1,19 @@
+# Test configuration: replaces src/main/resources/application.yaml during tests.
+# Tests use an in-memory H2 database (PostgreSQL mode), never Neon, so they run offline.
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+app:
+  seed:
+    enabled: false
