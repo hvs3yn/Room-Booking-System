@@ -2,7 +2,7 @@
 
 **Team:** Onur · Huseyn · Aydan · Mehdi
 **Repository:** https://github.com/hvs3yn/Room-Booking-System
-**Stack:** Java 21 + Spring Boot 3.5 + PostgreSQL on Neon + HTML/CSS/JS + JUnit 5 (details in [docs/SPEC.md](docs/SPEC.md))
+**Stack:** Java 27 + Spring Boot 4 + PostgreSQL on Neon + HTML/CSS/JS + JUnit 5 (details in [docs/SPEC.md](docs/SPEC.md))
 
 ---
 
@@ -86,7 +86,7 @@ git config user.email "your-github-email@example.com"
 git checkout -b <your-branch>
 ```
 
-Tools to install: **JDK 21** (e.g. Temurin), **IntelliJ IDEA Community**, **Git**. Maven is not needed (the project has the Maven Wrapper).
+Tools to install: **JDK 27** (e.g. Eclipse Temurin 27 or Oracle OpenJDK 27; in IntelliJ: File → Project Structure → SDK → Download JDK → version 27), **IntelliJ IDEA Community**, **Git**. Maven is not needed (the project has the Maven Wrapper).
 
 ## 6. Definition of Done (whole project)
 

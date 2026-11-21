@@ -66,7 +66,7 @@ time searching for an empty room, and no clear overview of who uses which room a
 - A booking is always inside a single day.
 - Rooms can be booked only during opening hours **08:00–22:00**.
 - No authentication: anyone using the app may book or cancel (accepted for this project).
-- Technology: Java 21, Spring Boot 3, PostgreSQL on Neon, HTML/CSS/JavaScript (see `docs/SPEC.md`).
+- Technology: Java 27, Spring Boot 4, PostgreSQL on Neon, HTML/CSS/JavaScript (see `docs/SPEC.md`).
 - The application needs an internet connection to reach the Neon database; automated tests run offline with an in-memory H2 database.
 - Delivery within one month by a team of four, using Git branches and pull requests.
 
@@ -215,7 +215,7 @@ Acceptance criteria:
 | NFR-5 | **Maintainability:** layered architecture (API → Service → Repository), type hints, small functions. |
 | NFR-6 | **Testability:** business rules are covered by automated unit tests (JUnit 5 + Mockito). |
 | NFR-7 | **Security:** all database access uses Spring Data JPA with bound parameters (no SQL injection); database credentials are kept in environment variables, never in Git; user text is shown with `textContent` (no HTML injection). |
-| NFR-8 | **Portability:** runs on Windows, macOS and Linux with Java 21 and a modern browser. |
+| NFR-8 | **Portability:** runs on Windows, macOS and Linux with Java 27 and a modern browser. |
 
 ---
 
