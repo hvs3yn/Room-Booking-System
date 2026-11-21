@@ -73,6 +73,36 @@ Rules:
 
 ---
 
+## 0.2 Use the project's AI toolkit (`.claude/` folder)
+
+The repository contains a `.claude/` folder with **Everything Claude Code (ECC)**: ready-made agents,
+skills, slash commands and rules for Claude Code. If you use **Claude Code**, it loads them
+automatically when you open the repository. Use them in your work:
+
+| When | Use |
+|------|-----|
+| Planning a step before coding | `planner` agent or `/plan` command |
+| Writing tests first / adding tests | `tdd-guide` agent, `springboot-tdd` and `tdd-workflow` skills |
+| Spring Boot / JPA / PostgreSQL code | `springboot-patterns`, `jpa-patterns`, `postgres-patterns`, `java-coding-standards` skills |
+| REST API design | `api-design` skill |
+| Frontend (HTML/CSS/JS) | `frontend-patterns`, `frontend-a11y` skills |
+| Build or compile error | `java-build-resolver` agent or `/build-fix` command |
+| After writing code (before every commit) | `java-reviewer` agent (Java) or `code-reviewer` agent, or `/code-review` command |
+| Database schema or queries | `database-reviewer` agent |
+| Before opening a Pull Request | `security-reviewer` agent, then `/code-review <PR number>` on the opened PR |
+| Git and PRs | `git-workflow` skill, `/pr` command |
+
+Rules for the toolkit:
+- **This task file and the contract (Appendix A) win** over any ECC default. Examples: do not add
+  Testcontainers, JaCoCo, Lombok or any library that is not in the contract, even if an ECC skill suggests it;
+  ECC's "80% coverage" target is a goal, not a requirement.
+- Do not edit files inside `.claude/`. If an ECC hook prints an error on your computer (for example a path
+  like `C:\Java\Room Booking System\.claude` that does not exist on your machine), ignore it and tell the team.
+- If you use another AI tool (Cursor, Copilot, ChatGPT), you can still open the matching file in
+  `.claude/agents/`, `.claude/skills/` or `.claude/rules/ecc/java/` and give it to the AI as extra guidance.
+
+---
+
 ## 1. Your role
 
 **Aydan — REST API (controllers, DTOs, error handling, Swagger) and API tests.**

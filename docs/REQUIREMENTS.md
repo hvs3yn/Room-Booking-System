@@ -70,6 +70,17 @@ time searching for an empty room, and no clear overview of who uses which room a
 - The application needs an internet connection to reach the Neon database; automated tests run offline with an in-memory H2 database.
 - Delivery within one month by a team of four, using Git branches and pull requests.
 
+### 4.1 Development approach and AI tooling
+
+- **Spec-driven development:** this document (what to build) and `docs/SPEC.md` (how to build it)
+  were written first; each member then builds their part from a task file in `tasks/`.
+- **AI toolkit in the repository:** the `.claude/` folder contains *Everything Claude Code (ECC)*,
+  a set of AI agents, skills, commands and rules for Claude Code. The team uses it to write,
+  test and review code, for example the `java-reviewer` and `code-reviewer` agents for code review,
+  `java-build-resolver` for build errors, `tdd-guide` and the `springboot-tdd` skill for tests,
+  `database-reviewer` for the PostgreSQL schema and `security-reviewer` before each Pull Request.
+- Every member must understand and be able to explain all code, including code written with AI help.
+
 ---
 
 ## 5. Functional requirements
