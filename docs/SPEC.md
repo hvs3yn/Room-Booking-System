@@ -5,6 +5,8 @@
 > status codes and messages in this file **exactly**, so that the four parts fit together
 > without changes when the branches are merged.
 > If something must change, open a Pull Request that edits this file first and tell the team.
+>
+> **Code style:** all Java code must follow [CODE_QUALITY.md](CODE_QUALITY.md) (names, methods, comments, review checklist).
 
 ---
 

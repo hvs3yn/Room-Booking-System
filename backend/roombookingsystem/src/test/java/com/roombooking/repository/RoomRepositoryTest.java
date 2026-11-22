@@ -1,8 +1,8 @@
-package com.roombookingsystem.roombookingsystem.repository;
+package com.roombooking.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.roombookingsystem.roombookingsystem.model.Room;
+import com.roombooking.model.Room;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

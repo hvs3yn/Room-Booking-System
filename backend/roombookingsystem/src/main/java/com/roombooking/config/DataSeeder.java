@@ -1,7 +1,7 @@
-package com.roombookingsystem.roombookingsystem.config;
+package com.roombooking.config;
 
-import com.roombookingsystem.roombookingsystem.model.Room;
-import com.roombookingsystem.roombookingsystem.repository.RoomRepository;
+import com.roombooking.model.Room;
+import com.roombooking.repository.RoomRepository;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

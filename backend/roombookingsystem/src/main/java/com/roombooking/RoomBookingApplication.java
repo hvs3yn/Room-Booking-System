@@ -1,13 +1,13 @@
-package com.roombookingsystem.roombookingsystem;
+package com.roombooking;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RoomBookingSystemApplication {
+public class RoomBookingApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RoomBookingSystemApplication.class, args);
+		SpringApplication.run(RoomBookingApplication.class, args);
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.roombookingsystem.roombookingsystem.exception;
+package com.roombooking.exception;
 
 import org.springframework.http.HttpStatus;
 

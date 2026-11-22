@@ -1,4 +1,4 @@
-package com.roombookingsystem.roombookingsystem.exception;
+package com.roombooking.exception;
 
 /** Thrown when someone tries to delete a room that still has bookings. */
 public class RoomInUseException extends ConflictException {

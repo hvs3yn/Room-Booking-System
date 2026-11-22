@@ -1,6 +1,6 @@
-package com.roombookingsystem.roombookingsystem.repository;
+package com.roombooking.repository;
 
-import com.roombookingsystem.roombookingsystem.model.Booking;
+import com.roombooking.model.Booking;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

@@ -1,9 +1,9 @@
-package com.roombookingsystem.roombookingsystem.repository;
+package com.roombooking.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.roombookingsystem.roombookingsystem.model.Booking;
-import com.roombookingsystem.roombookingsystem.model.Room;
+import com.roombooking.model.Booking;
+import com.roombooking.model.Room;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

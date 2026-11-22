@@ -1,6 +1,6 @@
-package com.roombookingsystem.roombookingsystem.repository;
+package com.roombooking.repository;
 
-import com.roombookingsystem.roombookingsystem.model.Room;
+import com.roombooking.model.Room;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
