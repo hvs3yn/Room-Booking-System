@@ -1,4 +1,4 @@
-package com.roombookingsystem.roombookingsystem.exception;
+package com.roombooking.exception;
 
 /** Thrown when no room exists with the given id. */
 public class RoomNotFoundException extends NotFoundException {

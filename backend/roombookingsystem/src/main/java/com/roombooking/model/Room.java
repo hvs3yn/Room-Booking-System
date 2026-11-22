@@ -1,4 +1,4 @@
-package com.roombookingsystem.roombookingsystem.model;
+package com.roombooking.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

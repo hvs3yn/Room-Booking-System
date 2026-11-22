@@ -1,4 +1,4 @@
-package com.roombookingsystem.roombookingsystem.exception;
+package com.roombooking.exception;
 
 /** Thrown when a new booking overlaps an existing booking of the same room. */
 public class BookingConflictException extends ConflictException {
