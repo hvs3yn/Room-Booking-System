@@ -251,6 +251,8 @@ Reviewer: **Aydan**. Attach 2 screenshots in the PR description.
 > status codes and messages in this file **exactly**, so that the four parts fit together
 > without changes when the branches are merged.
 > If something must change, open a Pull Request that edits this file first and tell the team.
+>
+> **Code style:** all Java code must follow [CODE_QUALITY.md](../docs/CODE_QUALITY.md) (names, methods, comments, review checklist).
 
 ---
 
@@ -391,6 +393,11 @@ Room-Booking-System/
 │   │   ├── ClockConfig.java                        (Huseyn)
 │   │   └── OpenApiConfig.java                      (Aydan)
 │   ├── service/
+│   │   ├── params/
+│   │   │   ├── TimeSlot.java                       (Huseyn)
+│   │   │   ├── ParsedSlot.java                     (Huseyn)
+│   │   │   ├── TimeRange.java                      (Huseyn)
+│   │   │   └── NewBooking.java                     (Huseyn)
 │   │   ├── TimeRules.java                          (Huseyn)
 │   │   ├── RoomService.java                        (Huseyn)
 │   │   └── BookingService.java                     (Huseyn)
@@ -756,9 +763,9 @@ public final class TimeRules {
 
     public static LocalDate parseDate(String value) { ... }        // BR-4, throws InvalidInputException
     public static LocalTime parseTime(String value) { ... }        // BR-5, throws InvalidInputException
+    public static ParsedSlot parseSlot(TimeSlot slot) { ... }      // BR-4 to BR-7: parses date + times, validates range
     public static void validateTimeRange(LocalTime start, LocalTime end) { ... }  // BR-6, BR-7
-    public static boolean intervalsOverlap(LocalTime startA, LocalTime endA,
-                                           LocalTime startB, LocalTime endB) { ... } // BR-9
+    public static boolean intervalsOverlap(TimeRange first, TimeRange second) { ... } // BR-9
     public static String formatTime(LocalTime time) { ... }        // "HH:mm"
 }
 ```
@@ -777,6 +784,22 @@ public class ClockConfig {
 }
 ```
 
+### `params/` — parameter objects (package `com.roombooking.service.params`)
+
+Related parameters are grouped in records, so no service method has more than 3 parameters
+(see CODE_QUALITY.md section 4.1). `TimeSlot` and `NewBooking` hold the raw strings from the request;
+`ParsedSlot` is the checked result of `TimeRules.parseSlot` and is used inside the services.
+
+```java
+public record TimeSlot(String date, String startTime, String endTime) { }
+public record NewBooking(Long roomId, String bookedBy, String purpose, TimeSlot slot) { }
+public record ParsedSlot(LocalDate date, LocalTime start, LocalTime end) { }
+public record TimeRange(LocalTime start, LocalTime end) { }   // used by TimeRules.intervalsOverlap
+```
+
+Controllers build them from the request, e.g.
+`new NewBooking(request.roomId(), request.bookedBy(), request.purpose(), new TimeSlot(request.date(), request.startTime(), request.endTime()))`.
+
 ### `RoomService.java`
 
 ```java
@@ -793,8 +816,7 @@ public class RoomService {
     @Transactional
     public void deleteRoom(Long roomId) { ... }                                  // RoomNotFoundException, BR-14
     @Transactional(readOnly = true)
-    public List<Room> findFreeRooms(String date, String startTime, String endTime,
-                                    Integer minCapacity) { ... }                 // BR-12, BR-13 (minCapacity may be null)
+    public List<Room> findFreeRooms(TimeSlot slot, Integer minCapacity) { ... }  // BR-12, BR-13 (minCapacity may be null)
 }
 ```
 
@@ -807,8 +829,7 @@ public class BookingService {
                           Clock clock) { ... }
 
     @Transactional
-    public Booking createBooking(Long roomId, String bookedBy, String date,
-                                 String startTime, String endTime, String purpose) { ... }
+    public Booking createBooking(NewBooking newBooking) { ... }
     @Transactional(readOnly = true)
     public List<Booking> listBookings(Long roomId, String date) { ... }
         // both optional (null = no filter); validates date if given (BR-4);

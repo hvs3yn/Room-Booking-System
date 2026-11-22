@@ -120,6 +120,10 @@ Your code must not know anything about HTTP or JSON — only Java objects, repos
 | `src/main/java/com/roombooking/service/TimeRules.java` | Contract section 10. |
 | `src/main/java/com/roombooking/service/RoomService.java` | Contract section 10. |
 | `src/main/java/com/roombooking/service/BookingService.java` | Contract section 10. |
+| `src/main/java/com/roombooking/service/params/TimeSlot.java` | Contract section 10 (`params/`). |
+| `src/main/java/com/roombooking/service/params/ParsedSlot.java` | Contract section 10 (`params/`). |
+| `src/main/java/com/roombooking/service/params/TimeRange.java` | Contract section 10 (`params/`). |
+| `src/main/java/com/roombooking/service/params/NewBooking.java` | Contract section 10 (`params/`). |
 | `src/main/java/com/roombooking/config/ClockConfig.java` | Contract section 10. |
 | `src/test/java/com/roombooking/service/TimeRulesTest.java` | Step 4. |
 | `src/test/java/com/roombooking/service/RoomServiceTest.java` | Step 4. |
@@ -144,7 +148,8 @@ Implement exactly as in contract section 10 with the messages from section 9:
   error → `"Time must be in HH:mm format (24-hour)."`.
 - `validateTimeRange(start, end)`: `!start.isBefore(end)` → `"Start time must be before end time."`;
   `start.isBefore(OPENING_TIME) || end.isAfter(CLOSING_TIME)` → `"Bookings are allowed only between 08:00 and 22:00."`.
-- `intervalsOverlap(a1, a2, b1, b2)`: `a1.isBefore(b2) && b1.isBefore(a2)`.
+- `parseSlot(TimeSlot slot)`: `parseDate` + `parseTime` (start, end) + `validateTimeRange` → `new ParsedSlot(date, start, end)`.
+- `intervalsOverlap(TimeRange first, TimeRange second)`: `first.start().isBefore(second.end()) && second.start().isBefore(first.end())`.
 - `formatTime(LocalTime)`: `TIME_FORMAT.format(time)`.
 Commit: `feat: add time validation rules and clock bean`
 
@@ -154,8 +159,7 @@ Commit: `feat: add time validation rules and clock bean`
 - `listRooms()`: `findAllByOrderByNameAsc()`.
 - `getRoom(id)`: `findById(id).orElseThrow(() -> new RoomNotFoundException(id))`.
 - `deleteRoom(id)`: `getRoom(id)`; if `bookingRepository.existsByRoomId(id)` → `RoomInUseException(room.getName())`; else `deleteById(id)`.
-- `findFreeRooms(date, startTime, endTime, minCapacity)`: parse date and times with `TimeRules`,
-  `validateTimeRange`; if `minCapacity != null && minCapacity < 1` → `"Minimum capacity must be a positive whole number."`;
+- `findFreeRooms(TimeSlot slot, Integer minCapacity)`: parse and check the slot with `TimeRules.parseSlot`; if `minCapacity != null && minCapacity < 1` → `"Minimum capacity must be a positive whole number."`;
   `bookedIds = bookingRepository.findBookedRoomIds(...)`; return `findAllByOrderByNameAsc()` filtered with a stream:
   not in `bookedIds` and (`minCapacity == null || capacity >= minCapacity`).
 - Use private helpers `validateName` and `validateCapacity`. No method longer than ~20 lines.
@@ -163,7 +167,7 @@ Commit: `feat: add room service`
 
 ### Step 3 — `BookingService`
 - Constructor takes `RoomRepository`, `BookingRepository`, `Clock`.
-- `createBooking(roomId, bookedBy, date, startTime, endTime, purpose)` — follow the **validation order**
+- `createBooking(NewBooking newBooking)` — follow the **validation order**
   in contract section 9 exactly. Private helpers: `findRoomOrThrow`, `validateBookedBy`, `normalizePurpose`,
   `ensureNotInPast`, `ensureNoOverlap`.
   - "now" = `LocalDateTime.now(clock)`; reject if `LocalDateTime.of(date, start).isBefore(now)`.
@@ -251,6 +255,8 @@ In the PR description, list which business rule (BR-1…BR-14) is covered by whi
 > status codes and messages in this file **exactly**, so that the four parts fit together
 > without changes when the branches are merged.
 > If something must change, open a Pull Request that edits this file first and tell the team.
+>
+> **Code style:** all Java code must follow [CODE_QUALITY.md](../docs/CODE_QUALITY.md) (names, methods, comments, review checklist).
 
 ---
 
@@ -391,6 +397,11 @@ Room-Booking-System/
 │   │   ├── ClockConfig.java                        (Huseyn)
 │   │   └── OpenApiConfig.java                      (Aydan)
 │   ├── service/
+│   │   ├── params/
+│   │   │   ├── TimeSlot.java                       (Huseyn)
+│   │   │   ├── ParsedSlot.java                     (Huseyn)
+│   │   │   ├── TimeRange.java                      (Huseyn)
+│   │   │   └── NewBooking.java                     (Huseyn)
 │   │   ├── TimeRules.java                          (Huseyn)
 │   │   ├── RoomService.java                        (Huseyn)
 │   │   └── BookingService.java                     (Huseyn)
@@ -756,9 +767,9 @@ public final class TimeRules {
 
     public static LocalDate parseDate(String value) { ... }        // BR-4, throws InvalidInputException
     public static LocalTime parseTime(String value) { ... }        // BR-5, throws InvalidInputException
+    public static ParsedSlot parseSlot(TimeSlot slot) { ... }      // BR-4 to BR-7: parses date + times, validates range
     public static void validateTimeRange(LocalTime start, LocalTime end) { ... }  // BR-6, BR-7
-    public static boolean intervalsOverlap(LocalTime startA, LocalTime endA,
-                                           LocalTime startB, LocalTime endB) { ... } // BR-9
+    public static boolean intervalsOverlap(TimeRange first, TimeRange second) { ... } // BR-9
     public static String formatTime(LocalTime time) { ... }        // "HH:mm"
 }
 ```
@@ -777,6 +788,22 @@ public class ClockConfig {
 }
 ```
 
+### `params/` — parameter objects (package `com.roombooking.service.params`)
+
+Related parameters are grouped in records, so no service method has more than 3 parameters
+(see CODE_QUALITY.md section 4.1). `TimeSlot` and `NewBooking` hold the raw strings from the request;
+`ParsedSlot` is the checked result of `TimeRules.parseSlot` and is used inside the services.
+
+```java
+public record TimeSlot(String date, String startTime, String endTime) { }
+public record NewBooking(Long roomId, String bookedBy, String purpose, TimeSlot slot) { }
+public record ParsedSlot(LocalDate date, LocalTime start, LocalTime end) { }
+public record TimeRange(LocalTime start, LocalTime end) { }   // used by TimeRules.intervalsOverlap
+```
+
+Controllers build them from the request, e.g.
+`new NewBooking(request.roomId(), request.bookedBy(), request.purpose(), new TimeSlot(request.date(), request.startTime(), request.endTime()))`.
+
 ### `RoomService.java`
 
 ```java
@@ -793,8 +820,7 @@ public class RoomService {
     @Transactional
     public void deleteRoom(Long roomId) { ... }                                  // RoomNotFoundException, BR-14
     @Transactional(readOnly = true)
-    public List<Room> findFreeRooms(String date, String startTime, String endTime,
-                                    Integer minCapacity) { ... }                 // BR-12, BR-13 (minCapacity may be null)
+    public List<Room> findFreeRooms(TimeSlot slot, Integer minCapacity) { ... }  // BR-12, BR-13 (minCapacity may be null)
 }
 ```
 
@@ -807,8 +833,7 @@ public class BookingService {
                           Clock clock) { ... }
 
     @Transactional
-    public Booking createBooking(Long roomId, String bookedBy, String date,
-                                 String startTime, String endTime, String purpose) { ... }
+    public Booking createBooking(NewBooking newBooking) { ... }
     @Transactional(readOnly = true)
     public List<Booking> listBookings(Long roomId, String date) { ... }
         // both optional (null = no filter); validates date if given (BR-4);
